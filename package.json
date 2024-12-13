@@ -1,6 +1,6 @@
 {
   "name": "autocomplete-search",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,7 +12,9 @@
     "next": "14.2.15",
     "react": "^18",
     "react-dom": "^18",
-    "react-instantsearch": "^7.13.9"
+    "react-instantsearch": "^7.13.9",
+    "typesense": "^1.8.2",
+    "typesense-instantsearch-adapter": "^2.8.0"
   },
   "devDependencies": {
     "@types/node": "^20",
