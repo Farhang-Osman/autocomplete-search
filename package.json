@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "forExperiment": "tsx ./src/app/bookCollection"
   },
   "dependencies": {
+    "fs.promises": "^0.1.2",
     "next": "14.2.15",
     "react": "^18",
     "react-dom": "^18",
@@ -24,6 +26,7 @@
     "eslint-config-next": "14.2.15",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   }
 }

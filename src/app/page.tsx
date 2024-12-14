@@ -1,101 +1,105 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React from 'react';
+
+// import algoliasearch from 'algoliasearch/lite';
+import { Hit as AlgoliaHit } from 'instantsearch.js/es/types';
+import TypesenseInstantSearchAdapter from 'typesense-instantsearch-adapter';
+
+import {
+  Highlight,
+  Hits,
+  InstantSearch,
+  Pagination,
+  RefinementList,
+  SearchBox,
+} from 'react-instantsearch';
+
+// import './App.css';
+
+// const searchClient = algoliasearch(
+//   'latency',
+//   '6be0576ff61c053d5f9a3225e2a90f76'
+// );
+
+const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
+  server: {
+    apiKey: 'dO5e1kLIFhZdzbIoJrsqmpipx0aONY8u88JKid91KfihOwqN', // Be sure to use the search-only-api-key
+    nodes: [
+      {
+        host: 'localhost',
+        port: 8108,
+        protocol: 'http',
+      },
+    ],
+  },
+  // The following parameters are directly passed to Typesense's search API endpoint.
+  //  So you can pass any parameters supported by the search endpoint below.
+  //  query_by is required.
+  additionalSearchParameters: {
+    query_by: 'title',
+    // highlight_full_fields: 'title',
+    // highlight_start_tag: '<b>',
+    // highlight_end_tag: '</b>',
+  },
+});
+
+type HitProps = {
+  hit: AlgoliaHit<{
+    name: string;
+    image: string;
+    brand: string;
+    categories: string[];
+  }>;
+};
+
+function Hit({ hit }: any) {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <article className='hit'>
+      <div className='hit-image'>
+        <img src={hit.image_url} alt='image' />
+      </div>
+      <div>
+        <h1>
+          <Highlight hit={hit} attribute='title' />
+        </h1>
+        {/* <div>
+          By <strong>{hit.brand}</strong> in{' '}
+          <strong>{hit.categories[0]}</strong>
+        </div> */}
+      </div>
+    </article>
+  );
+}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+function App() {
+  return (
+    <div>
+      <InstantSearch
+        searchClient={typesenseInstantsearchAdapter.searchClient}
+        indexName='autobooks'
+        routing
+      >
+        <header className='header'>
+          <div className='header-wrapper wrapper'>
+            <nav className='header-nav'>
+              <a href='/'>Home</a>
+            </nav>
+            <SearchBox placeholder='search books' />
+          </div>
+        </header>
+        <div className='container wrapper'>
+          <div>
+            <RefinementList attribute='authors' />
+          </div>
+          <div>
+            <Hits hitComponent={Hit} />
+            <Pagination />
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </InstantSearch>
     </div>
   );
 }
+
+export default App;
