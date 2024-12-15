@@ -14,6 +14,8 @@ import {
   RefinementList,
   SearchBox,
 } from 'react-instantsearch';
+import { Autocomplete } from './autocomplete';
+import Typesense from 'typesense';
 
 // import './App.css';
 
@@ -21,6 +23,18 @@ import {
 //   'latency',
 //   '6be0576ff61c053d5f9a3225e2a90f76'
 // );
+
+const client = new Typesense.Client({
+  nodes: [
+    {
+      host: 'localhost', // For Typesense Cloud use xxx.a1.typesense.net
+      port: 8108, // For Typesense Cloud use 443
+      protocol: 'http', // For Typesense Cloud use https
+    },
+  ],
+  apiKey: 'dO5e1kLIFhZdzbIoJrsqmpipx0aONY8u88JKid91KfihOwqN',
+  connectionTimeoutSeconds: 2,
+});
 
 const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
   server: {
@@ -72,6 +86,54 @@ function Hit({ hit }: any) {
   );
 }
 
+export async function sources({ query }): any {
+  const results = await client.collections('autobooks').documents().search({
+    q: query,
+    query_by: 'title',
+    // highlight_full_fields: 'title',
+    // highlight_start_tag: '<b>',
+    // highlight_end_tag: '</b>',
+  });
+
+  return [
+    {
+      sourceId: 'predictions',
+      getItems() {
+        return results.hits;
+      },
+      getItemInputValue({
+        item: {
+          document: { title },
+        },
+      }) {
+        return `${title}`;
+      },
+      templates: {
+        item({ item, html }) {
+          // html is from the `htm` package. Docs: https://github.com/developit/htm
+          const address =
+            item.highlights.find(h => h.field === 'title')?.value ||
+            item.document['title'];
+          // const postcode =
+          //   item.highlights.find((h) => h.field === 'postcode')?.value ||
+          //   item.document['postcode'];
+          // Get the highlighted HTML fragment from Typesense results
+          const html_fragment = html`${address}`;
+
+          // Send the html_fragment to `html` tagged template
+          // Reference: https://github.com/developit/htm/issues/226#issuecomment-1205526098
+          return html`<div
+            dangerouslySetInnerHTML=${{ __html: html_fragment }}
+          ></div>`;
+        },
+        noResults() {
+          return 'No results found.';
+        },
+      },
+    },
+  ];
+}
+
 function App() {
   return (
     <div>
@@ -85,7 +147,13 @@ function App() {
             <nav className='header-nav'>
               <a href='/'>Home</a>
             </nav>
-            <SearchBox placeholder='search books' />
+            {/* <SearchBox placeholder='search books' /> */}
+            <Autocomplete
+              placeholder='Search products'
+              detachedMediaQuery='none'
+              openOnFocus
+              getSources={sources}
+            />
           </div>
         </header>
         <div className='container wrapper'>
