@@ -1,8 +1,15 @@
 import React from 'react';
-import { createElement, Fragment, useEffect, useRef, useState } from 'react';
+import {
+  createElement,
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+} from 'react';
 import { createRoot, Root } from 'react-dom/client';
-
 import { usePagination, useSearchBox } from 'react-instantsearch';
+import { createLocalStorageRecentSearchesPlugin } from '@algolia/autocomplete-plugin-recent-searches';
 import { autocomplete, AutocompleteOptions } from '@algolia/autocomplete-js';
 import { BaseItem } from '@algolia/autocomplete-core';
 
@@ -11,7 +18,6 @@ import '@algolia/autocomplete-theme-classic';
 type AutocompleteProps = Partial<AutocompleteOptions<BaseItem>> & {
   className?: string;
 };
-
 type SetInstantSearchUiStateOptions = {
   query: string;
 };
@@ -34,6 +40,23 @@ export function Autocomplete({
     setQuery(instantSearchUiState.query);
     setPage(0);
   }, [instantSearchUiState]);
+
+  const plugins = useMemo(() => {
+    const recentSearches = createLocalStorageRecentSearchesPlugin({
+      key: 'instantsearch',
+      limit: 3,
+      transformSource({ source }) {
+        return {
+          ...source,
+          onSelect({ item }) {
+            setInstantSearchUiState({ query: item.label });
+          },
+        };
+      },
+    });
+
+    return [recentSearches];
+  }, []);
 
   useEffect(() => {
     if (!autocompleteContainer.current) {
@@ -68,10 +91,11 @@ export function Autocomplete({
 
         panelRootRef.current.render(children);
       },
+      plugins,
     });
 
     return () => autocompleteInstance.destroy();
-  }, []);
+  }, [plugins]);
 
   return <div className={className} ref={autocompleteContainer} />;
 }
