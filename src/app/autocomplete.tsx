@@ -12,6 +12,7 @@ import { usePagination, useSearchBox } from 'react-instantsearch';
 import { createLocalStorageRecentSearchesPlugin } from '@algolia/autocomplete-plugin-recent-searches';
 import { autocomplete, AutocompleteOptions } from '@algolia/autocomplete-js';
 import { BaseItem } from '@algolia/autocomplete-core';
+import { debounce } from '@algolia/autocomplete-shared';
 
 import '@algolia/autocomplete-theme-classic';
 
@@ -35,6 +36,11 @@ export function Autocomplete({
 
   const [instantSearchUiState, setInstantSearchUiState] =
     useState<SetInstantSearchUiStateOptions>({ query });
+
+  const debouncedSetInstantSearchUiState = debounce(
+    setInstantSearchUiState,
+    500
+  );
 
   useEffect(() => {
     setQuery(instantSearchUiState.query);
@@ -75,7 +81,7 @@ export function Autocomplete({
       },
       onStateChange({ prevState, state }) {
         if (prevState.query !== state.query) {
-          setInstantSearchUiState({
+          debouncedSetInstantSearchUiState({
             query: state.query,
           });
         }
