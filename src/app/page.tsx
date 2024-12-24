@@ -134,40 +134,42 @@ export async function sources({ query }): any {
   ];
 }
 
-function App() {
+const App = () => {
   return (
-    <div>
-      <InstantSearch
-        searchClient={typesenseInstantsearchAdapter.searchClient}
-        indexName='autobooks'
-        routing
-      >
-        <header className='header'>
-          <div className='header-wrapper wrapper'>
-            <nav className='header-nav'>
-              <a href='/'>Home</a>
-            </nav>
-            {/* <SearchBox placeholder='search books' /> */}
-            <Autocomplete
-              placeholder='Search products'
-              detachedMediaQuery='none'
-              openOnFocus
-              getSources={sources}
-            />
-          </div>
-        </header>
-        <div className='container wrapper'>
-          <div>
-            <RefinementList attribute='authors' />
-          </div>
-          <div>
-            <Hits hitComponent={Hit} />
-            <Pagination />
-          </div>
-        </div>
-      </InstantSearch>
-    </div>
+    <div>Home</div>
+
+    // <div>
+    //   <InstantSearch
+    //     searchClient={typesenseInstantsearchAdapter.searchClient}
+    //     indexName='autobooks'
+    //     routing
+    //   >
+    //     <header className='header'>
+    //       <div className='header-wrapper wrapper'>
+    //         <nav className='header-nav'>
+    //           <a href='/'>Home</a>
+    //         </nav>
+    //         {/* <SearchBox placeholder='search books' /> */}
+    //         <Autocomplete
+    //           placeholder='Search products'
+    //           detachedMediaQuery='none'
+    //           openOnFocus
+    //           getSources={sources}
+    //         />
+    //       </div>
+    //     </header>
+    //     <div className='container wrapper'>
+    //       <div>
+    //         <RefinementList attribute='authors' />
+    //       </div>
+    //       <div>
+    //         <Hits hitComponent={Hit} />
+    //         <Pagination />
+    //       </div>
+    //     </div>
+    //   </InstantSearch>
+    // </div>
   );
-}
+};
 
 export default App;
