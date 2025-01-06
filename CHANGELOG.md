@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.3.1](https://github.com/Farhang-Osman/autocomplete-search/compare/v0.3.0...v0.3.1) (2025-01-06)
+
+
+### Features
+
+* add debounce to autocomplete function ([1c8dbf2](https://github.com/Farhang-Osman/autocomplete-search/commit/1c8dbf25e4c4b4b144100505fe7b2f1c83cd7b81))
+* add server-side rendering functionality ([d7a4f91](https://github.com/Farhang-Osman/autocomplete-search/commit/d7a4f91c1c0f8d9a2377c3d97ae8835b36e9598c))
+
 ## [0.3.0](https://github.com/Farhang-Osman/autocomplete-search/compare/v0.2.0...v0.3.0) (2024-12-16)
 
 
