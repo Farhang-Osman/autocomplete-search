@@ -1,6 +1,5 @@
-'use client';
-
 import React, { useEffect, useState } from 'react';
+import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 
 import TypesenseInstantSearchAdapter from 'typesense-instantsearch-adapter';
 
@@ -9,14 +8,18 @@ import {
   Highlight,
   Pagination,
   RefinementList,
-  //   SearchBox,
+  getServerState,
+  SearchBox,
 } from 'react-instantsearch';
 import { InstantSearchNext } from 'react-instantsearch-nextjs';
+import { createInstantSearchRouterNext } from 'react-instantsearch-router-nextjs';
 import { Autocomplete } from '../autocomplete';
 import Typesense from 'typesense';
 import { typesenseConfig } from '../_tools/typesenseConfig';
 import { simple } from 'instantsearch.js/es/lib/stateMappings';
 import { usePathname } from 'next/navigation';
+import singletonRouter from 'next/router';
+import { renderToString } from 'react-dom/server';
 
 // import './App.css';
 
@@ -102,91 +105,89 @@ export async function sources({ query }): any {
   ];
 }
 
-// function getCategorySlug(name) {
-//   return name.split(' ').map(encodeURIComponent).join('+');
-// }
-// function getCategoryName(slug) {
-//   return slug.split('+').map(decodeURIComponent).join(' ');
-// }
+function getCategorySlug(name) {
+  return name.split(' ').map(encodeURIComponent).join('+');
+}
+function getCategoryName(slug) {
+  return slug.split('+').map(decodeURIComponent).join(' ');
+}
 
-// const search = instantsearch({
-//   searchClient,
-//   indexName: 'instant_search',
-//   routing: {
-//     router: instantsearch.routers.history({
-//       windowTitle({ category, query }) {
-//         const queryTitle = query ? `Results for "${query}"` : 'Search';
+// const routing = {
+//   router: history({
+//     windowTitle({ category, query }) {
+//       const queryTitle = query ? `Results for "${query}"` : 'Search';
 
-//         if (category) {
-//           return `${category} - ${queryTitle}`;
-//         }
+//       if (category) {
+//         return `${category} – ${queryTitle}`;
+//       }
 
-//         return queryTitle;
-//       },
+//       return queryTitle;
+//     },
 
-//       createURL({ qsModule, routeState, location }) {
-//         const urlParts = location.href.match(/^(.*?)\/search/);
-//         const baseUrl = `${urlParts ? urlParts[1] : ''}/`;
+//     createURL({ qsModule, routeState, location }) {
+//       const urlParts = location.href.match(/^(.*?)\/search/);
+//       const baseUrl = `${urlParts ? urlParts[1] : ''}/`;
 
-//         const categoryPath = routeState.category
-//           ? `${getCategorySlug(routeState.category)}/`
-//           : '';
-//         const queryParameters = {};
+//       const categoryPath = routeState.category
+//         ? `${getCategorySlug(routeState.category)}/`
+//         : '';
+//       const queryParameters = {};
 
-//         if (routeState.query) {
-//           queryParameters.query = encodeURIComponent(routeState.query);
-//         }
-//         if (routeState.page !== 1) {
-//           queryParameters.page = routeState.page;
-//         }
-//         if (routeState.brands) {
-//           queryParameters.brands = routeState.brands.map(encodeURIComponent);
-//         }
+//       if (routeState.query) {
+//         queryParameters.query = encodeURIComponent(routeState.query);
+//       }
+//       if (routeState.page !== 1) {
+//         queryParameters.page = routeState.page;
+//       }
+//       if (routeState.brands) {
+//         queryParameters.brands = routeState.brands.map(encodeURIComponent);
+//       }
 
-//         const queryString = qsModule.stringify(queryParameters, {
-//           addQueryPrefix: true,
-//           arrayFormat: 'repeat',
-//         });
+//       const queryString = qsModule.stringify(queryParameters, {
+//         addQueryPrefix: true,
+//         arrayFormat: 'repeat',
+//       });
 
-//         return `${baseUrl}search/${categoryPath}${queryString}`;
-//       },
+//       return `${baseUrl}search/${categoryPath}${queryString}`;
+//     },
 
-//       parseURL({ qsModule, location }) {
-//         const pathnameMatches = location.pathname.match(/search\/(.*?)\/?$/);
-//         const category = getCategoryName(
-//           (pathnameMatches && pathnameMatches[1]) || ''
-//         );
-//         const {
-//           query = '',
-//           page,
-//           brands = [],
-//         } = qsModule.parse(location.search.slice(1));
-//         // `qs` does not return an array when there's a single value.
-//         const allBrands = Array.isArray(brands)
-//           ? brands
-//           : [brands].filter(Boolean);
+//     parseURL({ qsModule, location }) {
+//       const pathnameMatches = location.pathname.match(/search\/(.*?)\/?$/);
+//       const category = getCategoryName(pathnameMatches?.[1] || '');
+//       const {
+//         query = '',
+//         page,
+//         brands = [],
+//       } = qsModule.parse(location.search.slice(1));
+//       // `qs` does not return an array when there's a single value.
+//       const allBrands = Array.isArray(brands)
+//         ? brands
+//         : [brands].filter(Boolean);
 
-//         return {
-//           query: decodeURIComponent(query),
-//           page,
-//           brands: allBrands.map(decodeURIComponent),
-//           category,
-//         };
-//       },
-//     }),
+//       return {
+//         query: decodeURIComponent(query),
+//         page,
+//         brands: allBrands.map(decodeURIComponent),
+//         category,
+//       };
+//     },
+//   }),
 
-//     stateMapping: {
-//       stateToRoute(uiState) {
-//         return {
-//           query: uiState.query,
-//           page: uiState.page,
-//           brands: uiState.refinementList && uiState.refinementList.brand,
-//           category: uiState.menu && uiState.menu.categories,
-//         };
-//       },
+//   stateMapping: {
+//     stateToRoute(uiState) {
+//       const indexUiState = uiState['instant_search'] || {};
 
-//       routeToState(routeState) {
-//         return {
+//       return {
+//         query: indexUiState.query,
+//         page: indexUiState.page,
+//         brands: indexUiState.refinementList?.brand,
+//         category: indexUiState.menu?.categories,
+//       };
+//     },
+
+//     routeToState(routeState) {
+//       return {
+//         instant_search: {
 //           query: routeState.query,
 //           page: routeState.page,
 //           menu: {
@@ -195,78 +196,306 @@ export async function sources({ query }): any {
 //           refinementList: {
 //             brand: routeState.brands,
 //           },
-//         };
-//       },
+//         },
+//       };
 //     },
 //   },
-// });
+// };
 
-export function HeaderComponent({ children }: { children?: React.ReactNode }) {
-  const pathname = usePathname();
+export function HeaderComponent({ serverUrl }) {
+  // const pathname = usePathname();
+  // const isSearch = pathname === '/search' ? true : false;
 
-  const isSearch = pathname === '/search' ? true : false;
+  // const [firstName, setFirstName] = useState('');
+  // const getCurrentUrl: string = `http://localhost:3000${pathname}`;
+  return (
+    <InstantSearchNext
+      searchClient={typesenseInstantsearchAdapter.searchClient}
+      indexName='autobooks'
+      // routing
+      // future={{ preserveSharedStateOnUnmount: true }}
+      routing={{
+        router: createInstantSearchRouterNext({
+          singletonRouter,
+          serverUrl,
+          routerOptions: {
+            windowTitle({ category, query }) {
+              const queryTitle = query ? `${query}` : 'Search';
 
-  if (isSearch) {
-    return (
-      <InstantSearchNext
-        searchClient={typesenseInstantsearchAdapter.searchClient}
-        indexName='autobooks'
-        routing
-      >
-        <header className='header'>
-          <div className='header-wrapper wrapper'>
-            <nav className='header-nav'>
-              <a href='/'>Home</a>
-            </nav>
-            {/* <SearchBox placeholder='search books' /> */}
-            <Autocomplete
-              placeholder='Search products'
-              detachedMediaQuery='none'
-              openOnFocus
-              getSources={sources}
-              // onSubmit={SearchFilter}
-            />
+              // if (category) {
+              //   return `${category} – ${queryTitle}`;
+              // }
+              return queryTitle;
+            },
+
+            createURL() {
+              // const urlParts = location.href.match(/^(.*?)\/search/);
+              // const baseUrl = `${urlParts ? urlParts[1] : ''}/`;
+
+              // const queryParameters = {};
+
+              // if (routeState.query) {
+              //   queryParameters.query = encodeURIComponent(routeState.query);
+              // }
+              // if (routeState.page !== 1) {
+              //   queryParameters.page = routeState.page;
+              // }
+              // // if (routeState.brands) {
+              // //   queryParameters.brands =
+              // //     routeState.brands.map(encodeURIComponent);
+              // // }
+
+              // console.log('queryParameters: ', queryParameters);
+
+              // const queryString = qsModule.stringify(queryParameters, {
+              //   addQueryPrefix: true,
+              //   arrayFormat: 'repeat',
+              // });
+
+              // return `${baseUrl}search/${queryString}`;
+              return `http://localhost:3000/search`;
+            },
+
+            // parseURL({ qsModule, location }) {
+            //   const pathnameMatches =
+            //     location.pathname.match(/search\/(.*?)\/?$/);
+            //   // const category = getCategoryName(pathnameMatches?.[1] || '');
+            //   const {
+            //     query = '',
+            //     page,
+            //     // brands = [],
+            //   } = qsModule.parse(location.search.slice(1));
+            //   // `qs` does not return an array when there's a single value.
+            //   // const allBrands = Array.isArray(brands)
+            //   //   ? brands
+            //   //   : [brands].filter(Boolean);
+
+            //   return {
+            //     query: decodeURIComponent(query),
+            //     page,
+            //     // brands: allBrands.map(decodeURIComponent),
+            //     // category,
+            //   };
+            // },
+          },
+        }),
+        stateMapping: {
+          stateToRoute(uiState) {
+            const indexUiState = uiState['autobooks'] || {};
+
+            return {
+              query: indexUiState.query,
+              page: indexUiState.page,
+              // brands: indexUiState.refinementList?.brand,
+              // category: indexUiState.menu?.categories,
+            };
+          },
+
+          routeToState(routeState) {
+            return {
+              autobooks: {
+                query: routeState.query,
+                page: routeState.page,
+                // menu: {
+                //   categories: routeState.category,
+                // },
+                // refinementList: {
+                //   brand: routeState.brands,
+                // },
+              },
+            };
+          },
+        },
+      }}
+    >
+      <header className='header'>
+        <div className='header-wrapper wrapper'>
+          <nav className='header-nav'>
+            <a href='/'>Home</a>
+          </nav>
+          {/* <SearchBox placeholder='search books' /> */}
+          <Autocomplete
+            placeholder='Search products'
+            detachedMediaQuery='none'
+            openOnFocus
+            getSources={sources}
+          />
+        </div>
+      </header>
+      <div>
+        <div className='container wrapper'>
+          <div>
+            <RefinementList attribute='authors' />
           </div>
-        </header>
-        <div>
-          <div className='container wrapper'>
-            <div>
-              <RefinementList attribute='authors' />
-            </div>
-            <div>
-              <Hits hitComponent={Hit} />
-              <Pagination />
-            </div>
+          <div>
+            <Hits hitComponent={Hit} />
+            <Pagination />
           </div>
         </div>
-        {children}
-      </InstantSearchNext>
-    );
-  } else {
-    return (
-      <>
-        <InstantSearchNext
-          searchClient={typesenseInstantsearchAdapter.searchClient}
-          indexName='autobooks'
-          routing
-        >
-          <header className='header'>
-            <div className='header-wrapper wrapper'>
-              <nav className='header-nav'>
-                <a href='/'>Home</a>
-              </nav>
-              {/* <SearchBox placeholder='search books' /> */}
-              <Autocomplete
-                placeholder='Search products'
-                detachedMediaQuery='none'
-                openOnFocus
-                getSources={sources}
-                // onSubmit={SearchFilter}
-              />
-            </div>
-          </header>
-        </InstantSearchNext>
-      </>
-    );
-  }
+      </div>
+    </InstantSearchNext>
+  );
+
+  //   return (
+  //     <InstantSearchNext
+  //       searchClient={typesenseInstantsearchAdapter.searchClient}
+  //       indexName='autobooks'
+  //       routing={{
+  //         router: createInstantSearchRouterNext({
+  //           singletonRouter,
+  //           serverUrl: 'http://localhost:8108',
+  //           routerOptions: {
+  //             cleanUrlOnDispose: false,
+  //             createURL({ qsModule, routeState, location }) {
+  //               // const urlParts = location.href.match(/^(.*?)\/search/);
+  //               // const baseUrl = `${urlParts ? urlParts[1] : ''}/`;
+
+  //               // const queryParameters = {};
+
+  //               // if (routeState.query) {
+  //               //   queryParameters.query = encodeURIComponent(routeState.query);
+  //               // }
+  //               // if (routeState.page !== 1) {
+  //               //   queryParameters.page = routeState.page;
+  //               // }
+  //               // if (routeState.brands) {
+  //               //   queryParameters.brands =
+  //               //     routeState.brands.map(encodeURIComponent);
+  //               // }
+
+  //               // const queryString = qsModule.stringify(queryParameters, {
+  //               //   addQueryPrefix: true,
+  //               //   arrayFormat: 'repeat',
+  //               // });
+
+  //               return `http://localhost:3000/search`;
+  //             },
+  //           },
+  //         }),
+  //       }}
+  //     >
+  //       <header className='header'>
+  //         <div className='header-wrapper wrapper'>
+  //           <nav className='header-nav'>
+  //             <a href='/'>Home</a>
+  //           </nav>
+  //           {/* <SearchBox placeholder='search books' /> */}
+  //           <Autocomplete
+  //             placeholder='Search products'
+  //             detachedMediaQuery='none'
+  //             openOnFocus
+  //             getSources={sources}
+  //             onSubmit={pushUrl}
+  //           />
+  //         </div>
+  //       </header>
+  //       <div>
+  //         <div className='container wrapper'>
+  //           <div>
+  //             <RefinementList attribute='authors' />
+  //           </div>
+  //           <div>
+  //             <Hits hitComponent={Hit} />
+  //             <Pagination />
+  //           </div>
+  //         </div>
+  //       </div>
+  //       {children}
+  //     </InstantSearchNext>
+  //   );
+  // } else {
+  //   return (
+  //     <>
+  //       <InstantSearchNext
+  //         searchClient={typesenseInstantsearchAdapter.searchClient}
+  //         indexName='autobooks'
+  //         routing={{
+  //           router: createInstantSearchRouterNext({
+  //             singletonRouter,
+  //             serverUrl: 'http://localhost:3000/?autobooks%5Bquery%5D=jo',
+  //             routerOptions: {
+  //               cleanUrlOnDispose: false,
+  //               createURL({ qsModule, routeState, location }) {
+  //                 // const urlParts = location.href.match(/^(.*?)\/search/);
+  //                 // const baseUrl = `${urlParts ? urlParts[1] : ''}/`;
+
+  //                 // const queryParameters = {};
+
+  //                 // if (routeState.query) {
+  //                 //   queryParameters.query = encodeURIComponent(routeState.query);
+  //                 // }
+  //                 // if (routeState.page !== 1) {
+  //                 //   queryParameters.page = routeState.page;
+  //                 // }
+  //                 // if (routeState.brands) {
+  //                 //   queryParameters.brands =
+  //                 //     routeState.brands.map(encodeURIComponent);
+  //                 // }
+
+  //                 // const queryString = qsModule.stringify(queryParameters, {
+  //                 //   addQueryPrefix: true,
+  //                 //   arrayFormat: 'repeat',
+  //                 // });
+
+  //                 return `http://localhost:3000/search`;
+  //               },
+  //             },
+  //           }),
+  //         }}
+  //       >
+  //         <header className='header'>
+  //           <div className='header-wrapper wrapper'>
+  //             <nav className='header-nav'>
+  //               <a href='/'>Home</a>
+  //             </nav>
+  //             {/* <SearchBox placeholder='search books' /> */}
+  //             <button
+  //               // onSubmit={
+  //               //   // e => console.log(e.target.value)
+  //               //   // handleSubmit
+  //               //   // window.open(
+  //               //   //   'http://localhost:3000/search?autobooks%5Bquery%5D=The%20Hunger%20Games'
+  //               //   // )
+  //               // }
+  //               // onInput={}
+  //               value={firstName} // ...force the input's value to match the state variable...
+  //               onSubmit={e => {
+  //                 const ann = e.target as HTMLButtonElement;
+  //                 setFirstName(ann.value);
+  //                 console.dir(firstName);
+  //                 window.open(`http://localhost:3000/search${firstName}`);
+  //               }}
+  //             >
+  //               <Autocomplete
+  //                 placeholder='Search products'
+  //                 detachedMediaQuery='none'
+  //                 openOnFocus
+  //                 getSources={sources}
+  //               />
+  //             </button>
+  //           </div>
+  //         </header>
+  //       </InstantSearchNext>
+  //     </>
+  //   );
+  // }
 }
+export async function getServerSideProps({ req }) {
+  const protocol = req.headers.referer?.split('://')[0] || 'https';
+  const serverUrl = `${protocol}://${req.headers.host}${req.url}`;
+
+  return {
+    props: {
+      serverState: serverUrl,
+    },
+  };
+}
+// const handleSubmit = event => {
+//   event.preventDefault();
+//   const formData = new FormData(event.target);
+//   const formObject = {};
+//   for (const [key, value] of Array.from(formData.entries())) {
+//     formObject[key] = value;
+//   }
+//   console.log(formObject);
+// };
