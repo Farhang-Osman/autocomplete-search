@@ -14,8 +14,6 @@ import {
 import { Autocomplete } from '../autocomplete';
 import { typesenseConfig } from '../_tools/typesenseConfig';
 
-// import './App.css';
-
 function Hit({ hit }: any) {
   return (
     <article className='hit'>
