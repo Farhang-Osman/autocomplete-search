@@ -1,5 +1,3 @@
-'use client';
-
 // import React from 'react';
 
 // // import algoliasearch from 'algoliasearch/lite';
@@ -17,6 +15,7 @@ import {
 // import { Autocomplete } from './autocomplete';
 // import Typesense from 'typesense';
 import { HeaderComponent } from '../_components/header';
+import { Search } from '../_components/Search';
 // import { typesenseConfig } from '../_tools/typesenseConfig';
 
 // // import './App.css';
@@ -111,22 +110,10 @@ function Hit({ hit }: any) {
 function search() {
   return (
     <>
-      {/* <HeaderComponent>
-        <div>
-          <div className='container wrapper'>
-            <div>
-              <RefinementList attribute='authors' />
-            </div>
-            <div>
-              <Hits hitComponent={Hit} />
-              <Pagination />
-            </div>
-          </div>
-        </div>
-      </HeaderComponent> */}
       <div className='bg-slate-400'>
         <h2>Search Page</h2>
       </div>
+      <Search />
     </>
   );
 }

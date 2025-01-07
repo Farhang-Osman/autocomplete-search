@@ -202,140 +202,144 @@ function getCategoryName(slug) {
 //   },
 // };
 
-export function HeaderComponent({ serverUrl }) {
-  // const pathname = usePathname();
-  // const isSearch = pathname === '/search' ? true : false;
+export function HeaderComponent() {
+  // // const pathname = usePathname();
+  // // const isSearch = pathname === '/search' ? true : false;
 
-  // const [firstName, setFirstName] = useState('');
-  // const getCurrentUrl: string = `http://localhost:3000${pathname}`;
+  // // const [firstName, setFirstName] = useState('');
+  // // const getCurrentUrl: string = `http://localhost:3000${pathname}`;
+  // return (
+  //   <InstantSearchNext
+  //     searchClient={typesenseInstantsearchAdapter.searchClient}
+  //     indexName='autobooks'
+  //     // routing
+  //     // future={{ preserveSharedStateOnUnmount: true }}
+  //     routing={{
+  //       router: createInstantSearchRouterNext({
+  //         singletonRouter,
+  //         serverUrl,
+  //         routerOptions: {
+  //           windowTitle({ category, query }) {
+  //             const queryTitle = query ? `${query}` : 'Search';
+
+  //             // if (category) {
+  //             //   return `${category} – ${queryTitle}`;
+  //             // }
+  //             return queryTitle;
+  //           },
+
+  //           createURL() {
+  //             // const urlParts = location.href.match(/^(.*?)\/search/);
+  //             // const baseUrl = `${urlParts ? urlParts[1] : ''}/`;
+
+  //             // const queryParameters = {};
+
+  //             // if (routeState.query) {
+  //             //   queryParameters.query = encodeURIComponent(routeState.query);
+  //             // }
+  //             // if (routeState.page !== 1) {
+  //             //   queryParameters.page = routeState.page;
+  //             // }
+  //             // // if (routeState.brands) {
+  //             // //   queryParameters.brands =
+  //             // //     routeState.brands.map(encodeURIComponent);
+  //             // // }
+
+  //             // console.log('queryParameters: ', queryParameters);
+
+  //             // const queryString = qsModule.stringify(queryParameters, {
+  //             //   addQueryPrefix: true,
+  //             //   arrayFormat: 'repeat',
+  //             // });
+
+  //             // return `${baseUrl}search/${queryString}`;
+  //             return `http://localhost:3000/search`;
+  //           },
+
+  //           // parseURL({ qsModule, location }) {
+  //           //   const pathnameMatches =
+  //           //     location.pathname.match(/search\/(.*?)\/?$/);
+  //           //   // const category = getCategoryName(pathnameMatches?.[1] || '');
+  //           //   const {
+  //           //     query = '',
+  //           //     page,
+  //           //     // brands = [],
+  //           //   } = qsModule.parse(location.search.slice(1));
+  //           //   // `qs` does not return an array when there's a single value.
+  //           //   // const allBrands = Array.isArray(brands)
+  //           //   //   ? brands
+  //           //   //   : [brands].filter(Boolean);
+
+  //           //   return {
+  //           //     query: decodeURIComponent(query),
+  //           //     page,
+  //           //     // brands: allBrands.map(decodeURIComponent),
+  //           //     // category,
+  //           //   };
+  //           // },
+  //         },
+  //       }),
+  //       stateMapping: {
+  //         stateToRoute(uiState) {
+  //           const indexUiState = uiState['autobooks'] || {};
+
+  //           return {
+  //             query: indexUiState.query,
+  //             page: indexUiState.page,
+  //             // brands: indexUiState.refinementList?.brand,
+  //             // category: indexUiState.menu?.categories,
+  //           };
+  //         },
+
+  //         routeToState(routeState) {
+  //           return {
+  //             autobooks: {
+  //               query: routeState.query,
+  //               page: routeState.page,
+  //               // menu: {
+  //               //   categories: routeState.category,
+  //               // },
+  //               // refinementList: {
+  //               //   brand: routeState.brands,
+  //               // },
+  //             },
+  //           };
+  //         },
+  //       },
+  //     }}
+  //   >
+  //     <header className='header'>
+  //       <div className='header-wrapper wrapper'>
+  //         <nav className='header-nav'>
+  //           <a href='/'>Home</a>
+  //         </nav>
+  //         {/* <SearchBox placeholder='search books' /> */}
+  //         <Autocomplete
+  //           placeholder='Search products'
+  //           detachedMediaQuery='none'
+  //           openOnFocus
+  //           getSources={sources}
+  //         />
+  //       </div>
+  //     </header>
+  //     <div>
+  //       <div className='container wrapper'>
+  //         <div>
+  //           <RefinementList attribute='authors' />
+  //         </div>
+  //         <div>
+  //           <Hits hitComponent={Hit} />
+  //           <Pagination />
+  //         </div>
+  //       </div>
+  //     </div>
+  //   </InstantSearchNext>
+  // );
   return (
-    <InstantSearchNext
-      searchClient={typesenseInstantsearchAdapter.searchClient}
-      indexName='autobooks'
-      // routing
-      // future={{ preserveSharedStateOnUnmount: true }}
-      routing={{
-        router: createInstantSearchRouterNext({
-          singletonRouter,
-          serverUrl,
-          routerOptions: {
-            windowTitle({ category, query }) {
-              const queryTitle = query ? `${query}` : 'Search';
-
-              // if (category) {
-              //   return `${category} – ${queryTitle}`;
-              // }
-              return queryTitle;
-            },
-
-            createURL() {
-              // const urlParts = location.href.match(/^(.*?)\/search/);
-              // const baseUrl = `${urlParts ? urlParts[1] : ''}/`;
-
-              // const queryParameters = {};
-
-              // if (routeState.query) {
-              //   queryParameters.query = encodeURIComponent(routeState.query);
-              // }
-              // if (routeState.page !== 1) {
-              //   queryParameters.page = routeState.page;
-              // }
-              // // if (routeState.brands) {
-              // //   queryParameters.brands =
-              // //     routeState.brands.map(encodeURIComponent);
-              // // }
-
-              // console.log('queryParameters: ', queryParameters);
-
-              // const queryString = qsModule.stringify(queryParameters, {
-              //   addQueryPrefix: true,
-              //   arrayFormat: 'repeat',
-              // });
-
-              // return `${baseUrl}search/${queryString}`;
-              return `http://localhost:3000/search`;
-            },
-
-            // parseURL({ qsModule, location }) {
-            //   const pathnameMatches =
-            //     location.pathname.match(/search\/(.*?)\/?$/);
-            //   // const category = getCategoryName(pathnameMatches?.[1] || '');
-            //   const {
-            //     query = '',
-            //     page,
-            //     // brands = [],
-            //   } = qsModule.parse(location.search.slice(1));
-            //   // `qs` does not return an array when there's a single value.
-            //   // const allBrands = Array.isArray(brands)
-            //   //   ? brands
-            //   //   : [brands].filter(Boolean);
-
-            //   return {
-            //     query: decodeURIComponent(query),
-            //     page,
-            //     // brands: allBrands.map(decodeURIComponent),
-            //     // category,
-            //   };
-            // },
-          },
-        }),
-        stateMapping: {
-          stateToRoute(uiState) {
-            const indexUiState = uiState['autobooks'] || {};
-
-            return {
-              query: indexUiState.query,
-              page: indexUiState.page,
-              // brands: indexUiState.refinementList?.brand,
-              // category: indexUiState.menu?.categories,
-            };
-          },
-
-          routeToState(routeState) {
-            return {
-              autobooks: {
-                query: routeState.query,
-                page: routeState.page,
-                // menu: {
-                //   categories: routeState.category,
-                // },
-                // refinementList: {
-                //   brand: routeState.brands,
-                // },
-              },
-            };
-          },
-        },
-      }}
-    >
-      <header className='header'>
-        <div className='header-wrapper wrapper'>
-          <nav className='header-nav'>
-            <a href='/'>Home</a>
-          </nav>
-          {/* <SearchBox placeholder='search books' /> */}
-          <Autocomplete
-            placeholder='Search products'
-            detachedMediaQuery='none'
-            openOnFocus
-            getSources={sources}
-          />
-        </div>
-      </header>
-      <div>
-        <div className='container wrapper'>
-          <div>
-            <RefinementList attribute='authors' />
-          </div>
-          <div>
-            <Hits hitComponent={Hit} />
-            <Pagination />
-          </div>
-        </div>
-      </div>
-    </InstantSearchNext>
+    <>
+      <h2>HeaderComponent</h2>
+    </>
   );
-
   //   return (
   //     <InstantSearchNext
   //       searchClient={typesenseInstantsearchAdapter.searchClient}
@@ -480,16 +484,16 @@ export function HeaderComponent({ serverUrl }) {
   //   );
   // }
 }
-export async function getServerSideProps({ req }) {
-  const protocol = req.headers.referer?.split('://')[0] || 'https';
-  const serverUrl = `${protocol}://${req.headers.host}${req.url}`;
+// export async function getServerSideProps({ req }) {
+//   const protocol = req.headers.referer?.split('://')[0] || 'https';
+//   const serverUrl = `${protocol}://${req.headers.host}${req.url}`;
 
-  return {
-    props: {
-      serverState: serverUrl,
-    },
-  };
-}
+//   return {
+//     props: {
+//       serverState: serverUrl,
+//     },
+//   };
+// }
 // const handleSubmit = event => {
 //   event.preventDefault();
 //   const formData = new FormData(event.target);
