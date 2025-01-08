@@ -2,7 +2,10 @@
 
 import React from 'react';
 import TypesenseInstantSearchAdapter from 'typesense-instantsearch-adapter';
-import { InstantSearchNext } from 'react-instantsearch-nextjs';
+import {
+  InstantSearchNext,
+  type InstantSearchNextRouting,
+} from 'react-instantsearch-nextjs';
 import Typesense from 'typesense';
 import {
   Hits,
@@ -96,7 +99,7 @@ export async function sources({ query }): any {
   ];
 }
 
-const routerAndstateMapping = {
+const routerAndstateMapping: InstantSearchNextRouting<TUiState, TRouteState> = {
   router: {
     cleanUrlOnDispose: true,
     windowTitle({ category, query }) {
@@ -108,9 +111,6 @@ const routerAndstateMapping = {
       return queryTitle;
     },
     createURL({ qsModule, routeState, location }) {
-      const urlParts = location.href.match(/^(.*?)\/search/);
-      const baseUrl = `${urlParts ? urlParts[1] : ''}/`;
-
       const queryParameters = {};
 
       if (routeState.query) {
@@ -124,15 +124,14 @@ const routerAndstateMapping = {
       //     routeState.brands.map(encodeURIComponent);
       // }
 
-      //   console.log('queryParameters: ', queryParameters);
-
       const queryString = qsModule.stringify(queryParameters, {
         addQueryPrefix: true,
         arrayFormat: 'repeat',
       });
 
-      return `${baseUrl}search/${queryString}`;
-      //   return `http://localhost:3000/search`;
+      const { origin } = location;
+
+      return `${origin}/search${queryString}`;
     },
     parseURL({ qsModule, location }) {
       // const pathnameMatches =
