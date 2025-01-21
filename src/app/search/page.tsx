@@ -1,5 +1,7 @@
 import { Search } from '../_components/Search';
 
+export const dynamic = 'force-dynamic';
+
 function search() {
   return (
     <>
